@@ -1,0 +1,2128 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4e73df;
+            --secondary: #858796;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+            --warning: #f6c23e;
+            --info: #36b9cc;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
+        }
+        
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, #224abe 100%);
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-radius: 0.35rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+        }
+        
+        .content-wrapper {
+            min-height: 100vh;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 1rem 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2653d4;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .action-buttons .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .modal-header {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .form-label {
+            font-weight: 600;
+        }
+        
+        .dashboard-card {
+            transition: transform 0.3s;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .dashboard-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .login-page {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(120deg, #4e73df 0%, #224abe 100%);
+        }
+        
+        .login-card {
+            width: 400px;
+            padding: 2rem;
+            border-radius: 1rem;
+        }
+        
+        .page-transition {
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page (Initially Shown) -->
+    <div id="login-page" class="login-page">
+        <div class="card login-card">
+            <div class="card-body">
+                <h3 class="text-center mb-4">Patient Management System</h3>
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application (Hidden Initially) -->
+    <div id="main-app" class="d-none">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-2 p-0 sidebar">
+                    <div class="d-flex flex-column p-3">
+                        <h4 class="text-center mb-4">Patient Management</h4>
+                        <hr class="bg-white">
+                        <ul class="nav nav-pills flex-column mb-auto">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active" data-page="dashboard">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-page="patients">
+                                    <i class="fas fa-user-injured"></i> Patients
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-page="doctors">
+                                    <i class="fas fa-user-md"></i> Doctors
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-page="appointments">
+                                    <i class="fas fa-calendar-check"></i> Appointments
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-page="medical-records">
+                                    <i class="fas fa-notes-medical"></i> Medical Records
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-page="users">
+                                    <i class="fas fa-users"></i> Users
+                                </a>
+                            </li>
+                        </ul>
+                        <hr class="bg-white">
+                        <div class="text-center">
+                            <button id="logout-btn" class="btn btn-light btn-sm">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-lg-10 content-wrapper p-4">
+                    <!-- Top Navigation -->
+                    <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 shadow-sm rounded">
+                        <div class="container-fluid">
+                            <span id="page-title" class="navbar-brand">Dashboard</span>
+                            <div class="ms-auto">
+                                <span class="me-3"><i class="fas fa-user-circle"></i> <span id="user-name">Admin</span></span>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <!-- Page Content -->
+                    <div id="page-content">
+                        <!-- Dashboard Page -->
+                        <div id="dashboard-page" class="page-transition">
+                            <div class="row">
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card dashboard-card border-left-primary shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-user-injured text-primary dashboard-icon"></i>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">Patients</div>
+                                                <div class="h2 mb-0 font-weight-bold text-primary" id="patient-count">24</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card dashboard-card border-left-success shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-user-md text-success dashboard-icon"></i>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">Doctors</div>
+                                                <div class="h2 mb-0 font-weight-bold text-success" id="doctor-count">8</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card dashboard-card border-left-info shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-calendar-check text-info dashboard-icon"></i>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">Appointments</div>
+                                                <div class="h2 mb-0 font-weight-bold text-info" id="appointment-count">12</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card dashboard-card border-left-warning shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-notes-medical text-warning dashboard-icon"></i>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">Medical Records</div>
+                                                <div class="h2 mb-0 font-weight-bold text-warning" id="record-count">36</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 class="m-0 font-weight-bold">Recent Appointments</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered" id="recent-appointments-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Patient</th>
+                                                            <th>Doctor</th>
+                                                            <th>Date</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>John Doe</td>
+                                                            <td>Dr. Smith</td>
+                                                            <td>2023-10-15 10:00</td>
+                                                            <td><span class="badge bg-success">Completed</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Jane Smith</td>
+                                                            <td>Dr. Johnson</td>
+                                                            <td>2023-10-16 11:30</td>
+                                                            <td><span class="badge bg-primary">Scheduled</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Robert Brown</td>
+                                                            <td>Dr. Williams</td>
+                                                            <td>2023-10-16 14:00</td>
+                                                            <td><span class="badge bg-primary">Scheduled</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Emily Davis</td>
+                                                            <td>Dr. Miller</td>
+                                                            <td>2023-10-17 09:15</td>
+                                                            <td><span class="badge bg-primary">Scheduled</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 class="m-0 font-weight-bold">Recent Medical Records</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered" id="recent-records-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Patient</th>
+                                                            <th>Doctor</th>
+                                                            <th>Diagnosis</th>
+                                                            <th>Date</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>John Doe</td>
+                                                            <td>Dr. Smith</td>
+                                                            <td>Common Cold</td>
+                                                            <td>2023-10-15</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Mary Johnson</td>
+                                                            <td>Dr. Williams</td>
+                                                            <td>Hypertension</td>
+                                                            <td>2023-10-14</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Robert Brown</td>
+                                                            <td>Dr. Miller</td>
+                                                            <td>Diabetes Follow-up</td>
+                                                            <td>2023-10-13</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Sarah Wilson</td>
+                                                            <td>Dr. Johnson</td>
+                                                            <td>Annual Check-up</td>
+                                                            <td>2023-10-12</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Patients Page -->
+                        <div id="patients-page" class="d-none page-transition">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold">Patients Management</h6>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#patientModal">
+                                        <i class="fas fa-plus"></i> Add New Patient
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="patients-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>Gender</th>
+                                                    <th>DOB</th>
+                                                    <th>Blood Group</th>
+                                                    <th>Phone</th>
+                                                    <th>Email</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>John Doe</td>
+                                                    <td>Male</td>
+                                                    <td>1985-06-12</td>
+                                                    <td>O+</td>
+                                                    <td>555-123-4567</td>
+                                                    <td>john.doe@example.com</td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-patient" data-id="1">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-patient" data-id="1">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-patient" data-id="1">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>Jane Smith</td>
+                                                    <td>Female</td>
+                                                    <td>1990-03-24</td>
+                                                    <td>A+</td>
+                                                    <td>555-987-6543</td>
+                                                    <td>jane.smith@example.com</td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-patient" data-id="2">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-patient" data-id="2">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-patient" data-id="2">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Doctors Page -->
+                        <div id="doctors-page" class="d-none page-transition">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold">Doctors Management</h6>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#doctorModal">
+                                        <i class="fas fa-plus"></i> Add New Doctor
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="doctors-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>Specialization</th>
+                                                    <th>Phone</th>
+                                                    <th>Email</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>Dr. John Smith</td>
+                                                    <td>Cardiology</td>
+                                                    <td>555-111-2222</td>
+                                                    <td>dr.smith@example.com</td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-doctor" data-id="1">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-doctor" data-id="1">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-doctor" data-id="1">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>Dr. Sarah Johnson</td>
+                                                    <td>Neurology</td>
+                                                    <td>555-333-4444</td>
+                                                    <td>dr.johnson@example.com</td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-doctor" data-id="2">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-doctor" data-id="2">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-doctor" data-id="2">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appointments Page -->
+                        <div id="appointments-page" class="d-none page-transition">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold">Appointments Management</h6>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                                        <i class="fas fa-plus"></i> Add New Appointment
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="appointments-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Patient</th>
+                                                    <th>Doctor</th>
+                                                    <th>Date & Time</th>
+                                                    <th>Reason</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>John Doe</td>
+                                                    <td>Dr. Smith</td>
+                                                    <td>2023-10-15 10:00</td>
+                                                    <td>Regular Checkup</td>
+                                                    <td><span class="badge bg-success">Completed</span></td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-appointment" data-id="1">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-appointment" data-id="1">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-appointment" data-id="1">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>Jane Smith</td>
+                                                    <td>Dr. Johnson</td>
+                                                    <td>2023-10-16 11:30</td>
+                                                    <td>Headache Consultation</td>
+                                                    <td><span class="badge bg-primary">Scheduled</span></td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-appointment" data-id="2">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-appointment" data-id="2">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-appointment" data-id="2">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medical Records Page -->
+                        <div id="medical-records-page" class="d-none page-transition">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold">Medical Records Management</h6>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#medicalRecordModal">
+                                        <i class="fas fa-plus"></i> Add New Medical Record
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="medical-records-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Patient</th>
+                                                    <th>Doctor</th>
+                                                    <th>Diagnosis</th>
+                                                    <th>Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>John Doe</td>
+                                                    <td>Dr. Smith</td>
+                                                    <td>Common Cold</td>
+                                                    <td>2023-10-15</td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-record" data-id="1">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-record" data-id="1">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-record" data-id="1">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>Jane Smith</td>
+                                                    <td>Dr. Johnson</td>
+                                                    <td>Migraine</td>
+                                                    <td>2023-10-16</td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-record" data-id="2">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-record" data-id="2">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-record" data-id="2">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Users Page -->
+                        <div id="users-page" class="d-none page-transition">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold">Users Management</h6>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#userModal">
+                                        <i class="fas fa-plus"></i> Add New User
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="users-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Username</th>
+                                                    <th>Full Name</th>
+                                                    <th>Email</th>
+                                                    <th>Role</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>admin</td>
+                                                    <td>System Administrator</td>
+                                                    <td>admin@example.com</td>
+                                                    <td><span class="badge bg-danger">Admin</span></td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-user" data-id="1">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-user" data-id="1">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-user" data-id="1">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>drsmith</td>
+                                                    <td>Dr. John Smith</td>
+                                                    <td>dr.smith@example.com</td>
+                                                    <td><span class="badge bg-primary">Doctor</span></td>
+                                                    <td class="action-buttons">
+                                                        <button class="btn btn-info btn-sm view-user" data-id="2">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm edit-user" data-id="2">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger btn-sm delete-user" data-id="2">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Patient Modal -->
+    <div class="modal fade" id="patientModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="patientModalLabel">Add New Patient</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="patient-form">
+                        <input type="hidden" id="patient-id">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="patient-name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="patient-name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="patient-gender" class="form-label">Gender</label>
+                                <select class="form-select" id="patient-gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="patient-dob" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="patient-dob" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="patient-blood" class="form-label">Blood Group</label>
+                                <select class="form-select" id="patient-blood">
+                                    <option value="">Select Blood Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="patient-phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="patient-phone">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="patient-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="patient-email">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="emergency-contact" class="form-label">Emergency Contact Name</label>
+                                <input type="text" class="form-control" id="emergency-contact">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="emergency-relation" class="form-label">Relation with Patient</label>
+                                <input type="text" class="form-control" id="emergency-relation">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="emergency-phone" class="form-label">Emergency Contact Number</label>
+                                <input type="tel" class="form-control" id="emergency-phone">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="patient-address" class="form-label">Address</label>
+                                <textarea class="form-control" id="patient-address" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-patient">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Modal -->
+    <div class="modal fade" id="doctorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="doctorModalLabel">Add New Doctor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="doctor-form">
+                        <input type="hidden" id="doctor-id">
+                        <div class="mb-3">
+                            <label for="doctor-name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="doctor-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="doctor-specialization" class="form-label">Specialization</label>
+                            <input type="text" class="form-control" id="doctor-specialization">
+                        </div>
+                        <div class="mb-3">
+                            <label for="doctor-phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="doctor-phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="doctor-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="doctor-email">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-doctor">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Modal -->
+    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appointmentModalLabel">Add New Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="appointment-form">
+                        <input type="hidden" id="appointment-id">
+                        <div class="mb-3">
+                            <label for="appointment-patient" class="form-label">Patient</label>
+                            <select class="form-select" id="appointment-patient" required>
+                                <option value="">Select Patient</option>
+                                <option value="1">John Doe</option>
+                                <option value="2">Jane Smith</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="appointment-doctor" class="form-label">Doctor</label>
+                            <select class="form-select" id="appointment-doctor" required>
+                                <option value="">Select Doctor</option>
+                                <option value="1">Dr. John Smith</option>
+                                <option value="2">Dr. Sarah Johnson</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="appointment-date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="appointment-date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="appointment-time" class="form-label">Time</label>
+                            <input type="time" class="form-control" id="appointment-time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="appointment-reason" class="form-label">Reason</label>
+                            <textarea class="form-control" id="appointment-reason" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="appointment-status" class="form-label">Status</label>
+                            <select class="form-select" id="appointment-status">
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-appointment">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medical Record Modal -->
+    <div class="modal fade" id="medicalRecordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="medicalRecordModalLabel">Add New Medical Record</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="medical-record-form">
+                        <input type="hidden" id="record-id">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="record-patient" class="form-label">Patient</label>
+                                <select class="form-select" id="record-patient" required>
+                                    <option value="">Select Patient</option>
+                                    <option value="1">John Doe</option>
+                                    <option value="2">Jane Smith</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="record-doctor" class="form-label">Doctor</label>
+                                <select class="form-select" id="record-doctor" required>
+                                    <option value="">Select Doctor</option>
+                                    <option value="1">Dr. John Smith</option>
+                                    <option value="2">Dr. Sarah Johnson</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="record-diagnosis" class="form-label">Diagnosis</label>
+                            <textarea class="form-control" id="record-diagnosis" rows="2" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="record-treatment" class="form-label">Treatment</label>
+                            <textarea class="form-control" id="record-treatment" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="record-notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="record-notes" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Prescriptions</label>
+                            <div id="prescriptions-container">
+                                <div class="prescription-item row mb-2">
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control" placeholder="Medicine Name" name="medicine[]" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" placeholder="Dosage" name="dosage[]">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" placeholder="Duration" name="duration[]">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-danger btn-sm remove-prescription">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm mt-2" id="add-prescription">
+                                <i class="fas fa-plus"></i> Add Prescription
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-record">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="user-form">
+                        <input type="hidden" id="user-id">
+                        <div class="mb-3">
+                            <label for="username-input" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username-input" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="user-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user-fullname" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="user-fullname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="user-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="user-role" class="form-label">Role</label>
+                            <select class="form-select" id="user-role" required>
+                                <option value="admin">Admin</option>
+                                <option value="doctor">Doctor</option>
+                                <option value="staff">Staff</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-user">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Patient Modal -->
+    <div class="modal fade" id="viewPatientModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Patient Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> <span id="view-patient-name"></span></p>
+                            <p><strong>Gender:</strong> <span id="view-patient-gender"></span></p>
+                            <p><strong>Date of Birth:</strong> <span id="view-patient-dob"></span></p>
+                            <p><strong>Blood Group:</strong> <span id="view-patient-blood"></span></p>
+                            <p><strong>Phone:</strong> <span id="view-patient-phone"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> <span id="view-patient-email"></span></p>
+                            <p><strong>Emergency Contact:</strong> <span id="view-emergency-contact"></span></p>
+                            <p><strong>Relation:</strong> <span id="view-emergency-relation"></span></p>
+                            <p><strong>Emergency Phone:</strong> <span id="view-emergency-phone"></span></p>
+                            <p><strong>Address:</strong> <span id="view-patient-address"></span></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6>Recent Appointments</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Doctor</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patient-appointments">
+                                <!-- Will be filled dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <h6>Medical History</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Doctor</th>
+                                    <th>Diagnosis</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patient-records">
+                                <!-- Will be filled dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Doctor Modal -->
+    <div class="modal fade" id="viewDoctorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Doctor Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> <span id="view-doctor-name"></span></p>
+                            <p><strong>Specialization:</strong> <span id="view-doctor-specialization"></span></p>
+                            <p><strong>Phone:</strong> <span id="view-doctor-phone"></span></p>
+                            <p><strong>Email:</strong> <span id="view-doctor-email"></span></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6>Upcoming Appointments</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Patient</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctor-appointments">
+                                <tr>
+                                    <td>2023-10-16 11:30</td>
+                                    <td>Jane Smith</td>
+                                    <td>Headache Consultation</td>
+                                    <td><span class="badge bg-primary">Scheduled</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2023-10-17 14:00</td>
+                                    <td>Robert Brown</td>
+                                    <td>Follow-up</td>
+                                    <td><span class="badge bg-primary">Scheduled</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Appointment Modal -->
+    <div class="modal fade" id="viewAppointmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Appointment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Patient:</strong> <span id="view-appointment-patient"></span></p>
+                    <p><strong>Doctor:</strong> <span id="view-appointment-doctor"></span></p>
+                    <p><strong>Date & Time:</strong> <span id="view-appointment-datetime"></span></p>
+                    <p><strong>Reason:</strong> <span id="view-appointment-reason"></span></p>
+                    <p><strong>Status:</strong> <span id="view-appointment-status"></span></p>
+                    <p><strong>Notes:</strong> <span id="view-appointment-notes">No additional notes.</span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Medical Record Modal -->
+    <div class="modal fade" id="viewRecordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Medical Record Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Patient:</strong> <span id="view-record-patient"></span></p>
+                            <p><strong>Doctor:</strong> <span id="view-record-doctor"></span></p>
+                            <p><strong>Date:</strong> <span id="view-record-date"></span></p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Diagnosis</h6>
+                        <p id="view-record-diagnosis"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Treatment</h6>
+                        <p id="view-record-treatment"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Notes</h6>
+                        <p id="view-record-notes"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Prescriptions</h6>
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Dosage</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody id="view-record-prescriptions">
+                                <tr>
+                                    <td>Paracetamol</td>
+                                    <td>500mg twice daily</td>
+                                    <td>5 days</td>
+                                </tr>
+                                <tr>
+                                    <td>Vitamin C</td>
+                                    <td>1000mg once daily</td>
+                                    <td>10 days</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View User Modal -->
+    <div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Username:</strong> <span id="view-username"></span></p>
+                    <p><strong>Full Name:</strong> <span id="view-user-fullname"></span></p>
+                    <p><strong>Email:</strong> <span id="view-user-email"></span></p>
+                    <p><strong>Role:</strong> <span id="view-user-role"></span></p>
+                    <p><strong>Last Login:</strong> <span id="view-user-last-login">2023-10-15 08:45</span></p>
+                    <p><strong>Account Created:</strong> <span id="view-user-created">2023-01-10</span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+                    <input type="hidden" id="delete-id">
+                    <input type="hidden" id="delete-type">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        $(document).ready(function() {
+            // Demo login functionality
+            $('#login-form').on('submit', function(e) {
+                e.preventDefault();
+                const username = $('#username').val();
+                const password = $('#password').val();
+                
+                // Simple validation for demo
+                if (username && password) {
+                    $('#login-page').addClass('d-none');
+                    $('#main-app').removeClass('d-none');
+                    $('#user-name').text(username);
+                }
+            });
+            
+            // Logout functionality
+            $('#logout-btn').on('click', function() {
+                $('#main-app').addClass('d-none');
+                $('#login-page').removeClass('d-none');
+                $('#username').val('');
+                $('#password').val('');
+            });
+            
+            // Navigation functionality
+            $('.nav-link').on('click', function() {
+                const page = $(this).data('page');
+                
+                // Update active state
+                $('.nav-link').removeClass('active');
+                $(this).addClass('active');
+                
+                // Update page title
+                $('#page-title').text($(this).text().trim());
+                
+                // Show selected page, hide others
+                $('#page-content > div').addClass('d-none');
+                $(`#${page}-page`).removeClass('d-none');
+            });
+            
+
+
+
+            // CRUD Operations for Patients
+            $('#save-patient').on('click', function() {
+                const patientId = $('#patient-id').val();
+                const patientName = $('#patient-name').val();
+                const patientGender = $('#patient-gender').val();
+                const patientDob = $('#patient-dob').val();
+                const patientBlood = $('#patient-blood').val();
+                const patientPhone = $('#patient-phone').val();
+                const patientEmail = $('#patient-email').val();
+                
+                if (!patientName || !patientGender || !patientDob) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Demo: Add or update patient in table
+                if (patientId) {
+                    // Update existing patient
+                    alert('Patient updated successfully!');
+                } else {
+                    // Add new patient
+                    const newRow = `
+                        <tr>
+                            <td>${$('#patients-table tbody tr').length + 1}</td>
+                            <td>${patientName}</td>
+                            <td>${patientGender}</td>
+                            <td>${patientDob}</td>
+                            <td>${patientBlood}</td>
+                            <td>${patientPhone}</td>
+                            <td>${patientEmail}</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-info btn-sm view-patient" data-id="${$('#patients-table tbody tr').length + 1}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-warning btn-sm edit-patient" data-id="${$('#patients-table tbody tr').length + 1}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-patient" data-id="${$('#patients-table tbody tr').length + 1}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#patients-table tbody').append(newRow);
+                    alert('Patient added successfully!');
+                }
+                
+                // Reset form and close modal
+                $('#patient-form')[0].reset();
+                $('#patientModal').modal('hide');
+            });
+            
+            // Edit patient
+            $(document).on('click', '.edit-patient', function() {
+                const patientId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill form with patient data
+                $('#patient-id').val(patientId);
+                $('#patient-name').val(row.find('td:eq(1)').text());
+                $('#patient-gender').val(row.find('td:eq(2)').text());
+                $('#patient-dob').val(row.find('td:eq(3)').text());
+                $('#patient-blood').val(row.find('td:eq(4)').text());
+                $('#patient-phone').val(row.find('td:eq(5)').text());
+                $('#patient-email').val(row.find('td:eq(6)').text());
+                
+                // Update modal title
+                $('#patientModalLabel').text('Edit Patient');
+                $('#patientModal').modal('show');
+            });
+            
+            // View patient
+            $(document).on('click', '.view-patient', function() {
+                const patientId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill modal with patient data
+                $('#view-patient-name').text(row.find('td:eq(1)').text());
+                $('#view-patient-gender').text(row.find('td:eq(2)').text());
+                $('#view-patient-dob').text(row.find('td:eq(3)').text());
+                $('#view-patient-blood').text(row.find('td:eq(4)').text());
+                $('#view-patient-phone').text(row.find('td:eq(5)').text());
+                $('#view-patient-email').text(row.find('td:eq(6)').text());
+                
+                // Demo data for emergency contacts
+                $('#view-emergency-contact').text('Mary Doe');
+                $('#view-emergency-relation').text('Spouse');
+                $('#view-emergency-phone').text('555-987-6543');
+                $('#view-patient-address').text('123 Main St, Anytown, USA');
+                
+                // Demo data for appointments and records
+                $('#patient-appointments').html(`
+                    <tr>
+                        <td>2023-10-15 10:00</td>
+                        <td>Dr. Smith</td>
+                        <td>Regular Checkup</td>
+                        <td><span class="badge bg-success">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>2023-09-20 14:30</td>
+                        <td>Dr. Johnson</td>
+                        <td>Follow-up</td>
+                        <td><span class="badge bg-success">Completed</span></td>
+                    </tr>
+                `);
+                
+                $('#patient-records').html(`
+                    <tr>
+                        <td>2023-10-15</td>
+                        <td>Dr. Smith</td>
+                        <td>Common Cold</td>
+                    </tr>
+                    <tr>
+                        <td>2023-09-20</td>
+                        <td>Dr. Johnson</td>
+                        <td>Hypertension</td>
+                    </tr>
+                `);
+                
+                $('#viewPatientModal').modal('show');
+            });
+            
+            // Delete patient
+            $(document).on('click', '.delete-patient', function() {
+                const patientId = $(this).data('id');
+                $('#delete-id').val(patientId);
+                $('#delete-type').val('patient');
+                $('#deleteConfirmModal').modal('show');
+            });
+            
+
+
+
+
+            // CRUD Operations for Doctors
+            $('#save-doctor').on('click', function() {
+                const doctorId = $('#doctor-id').val();
+                const doctorName = $('#doctor-name').val();
+                const doctorSpecialization = $('#doctor-specialization').val();
+                const doctorPhone = $('#doctor-phone').val();
+                const doctorEmail = $('#doctor-email').val();
+                
+                if (!doctorName) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Demo: Add or update doctor in table
+                if (doctorId) {
+                    // Update existing doctor
+                    alert('Doctor updated successfully!');
+                } else {
+                    // Add new doctor
+                    const newRow = `
+                        <tr>
+                            <td>${$('#doctors-table tbody tr').length + 1}</td>
+                            <td>${doctorName}</td>
+                            <td>${doctorSpecialization}</td>
+                            <td>${doctorPhone}</td>
+                            <td>${doctorEmail}</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-info btn-sm view-doctor" data-id="${$('#doctors-table tbody tr').length + 1}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-warning btn-sm edit-doctor" data-id="${$('#doctors-table tbody tr').length + 1}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-doctor" data-id="${$('#doctors-table tbody tr').length + 1}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#doctors-table tbody').append(newRow);
+                    alert('Doctor added successfully!');
+                }
+                
+                // Reset form and close modal
+                $('#doctor-form')[0].reset();
+                $('#doctorModal').modal('hide');
+            });
+            
+            // Edit doctor
+            $(document).on('click', '.edit-doctor', function() {
+                const doctorId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill form with doctor data
+                $('#doctor-id').val(doctorId);
+                $('#doctor-name').val(row.find('td:eq(1)').text());
+                $('#doctor-specialization').val(row.find('td:eq(2)').text());
+                $('#doctor-phone').val(row.find('td:eq(3)').text());
+                $('#doctor-email').val(row.find('td:eq(4)').text());
+                
+                // Update modal title
+                $('#doctorModalLabel').text('Edit Doctor');
+                $('#doctorModal').modal('show');
+            });
+            
+            // View doctor
+            $(document).on('click', '.view-doctor', function() {
+                const doctorId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill modal with doctor data
+                $('#view-doctor-name').text(row.find('td:eq(1)').text());
+                $('#view-doctor-specialization').text(row.find('td:eq(2)').text());
+                $('#view-doctor-phone').text(row.find('td:eq(3)').text());
+                $('#view-doctor-email').text(row.find('td:eq(4)').text());
+                
+                $('#viewDoctorModal').modal('show');
+            });
+            
+            // Delete doctor
+            $(document).on('click', '.delete-doctor', function() {
+                const doctorId = $(this).data('id');
+                $('#delete-id').val(doctorId);
+                $('#delete-type').val('doctor');
+                $('#deleteConfirmModal').modal('show');
+            });
+            
+
+
+
+
+            // CRUD Operations for Appointments
+            $('#save-appointment').on('click', function() {
+                const appointmentId = $('#appointment-id').val();
+                const patientId = $('#appointment-patient').val();
+                const patientName = $('#appointment-patient option:selected').text();
+                const doctorId = $('#appointment-doctor').val();
+                const doctorName = $('#appointment-doctor option:selected').text();
+                const appointmentDate = $('#appointment-date').val();
+                const appointmentTime = $('#appointment-time').val();
+                const appointmentReason = $('#appointment-reason').val();
+                const appointmentStatus = $('#appointment-status').val();
+                
+                if (!patientId || !doctorId || !appointmentDate || !appointmentTime) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Demo: Add or update appointment in table
+                if (appointmentId) {
+                    // Update existing appointment
+                    alert('Appointment updated successfully!');
+                } else {
+                    // Add new appointment
+                    const newRow = `
+                        <tr>
+                            <td>${$('#appointments-table tbody tr').length + 1}</td>
+                            <td>${patientName}</td>
+                            <td>${doctorName}</td>
+                            <td>${appointmentDate} ${appointmentTime}</td>
+                            <td>${appointmentReason}</td>
+                            <td><span class="badge bg-primary">${appointmentStatus}</span></td>
+                            <td class="action-buttons">
+                                <button class="btn btn-info btn-sm view-appointment" data-id="${$('#appointments-table tbody tr').length + 1}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-warning btn-sm edit-appointment" data-id="${$('#appointments-table tbody tr').length + 1}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-appointment" data-id="${$('#appointments-table tbody tr').length + 1}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#appointments-table tbody').append(newRow);
+                    alert('Appointment added successfully!');
+                }
+                
+                // Reset form and close modal
+                $('#appointment-form')[0].reset();
+                $('#appointmentModal').modal('hide');
+            });
+            
+            // Edit appointment
+            $(document).on('click', '.edit-appointment', function() {
+                const appointmentId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill form with appointment data
+                $('#appointment-id').val(appointmentId);
+                // In a real app, you would set the correct patient and doctor IDs
+                $('#appointment-patient').val('1');
+                $('#appointment-doctor').val('1');
+                
+                // Extract date and time from the combined field
+                const dateTime = row.find('td:eq(3)').text().split(' ');
+                $('#appointment-date').val(dateTime[0]);
+                $('#appointment-time').val(dateTime[1]);
+                
+                $('#appointment-reason').val(row.find('td:eq(4)').text());
+                $('#appointment-status').val(row.find('td:eq(5)').text().trim());
+                
+                // Update modal title
+                $('#appointmentModalLabel').text('Edit Appointment');
+                $('#appointmentModal').modal('show');
+            });
+            
+            // View appointment
+            $(document).on('click', '.view-appointment', function() {
+                const appointmentId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill modal with appointment data
+                $('#view-appointment-patient').text(row.find('td:eq(1)').text());
+                $('#view-appointment-doctor').text(row.find('td:eq(2)').text());
+                $('#view-appointment-datetime').text(row.find('td:eq(3)').text());
+                $('#view-appointment-reason').text(row.find('td:eq(4)').text());
+                
+                // Get status text without the badge
+                const statusText = row.find('td:eq(5)').text().trim();
+                const statusClass = row.find('td:eq(5) .badge').attr('class').split('bg-')[1].split(' ')[0];
+                $('#view-appointment-status').html(`<span class="badge bg-${statusClass}">${statusText}</span>`);
+                
+                $('#viewAppointmentModal').modal('show');
+            });
+            
+            // Delete appointment
+            $(document).on('click', '.delete-appointment', function() {
+                const appointmentId = $(this).data('id');
+                $('#delete-id').val(appointmentId);
+                $('#delete-type').val('appointment');
+                $('#deleteConfirmModal').modal('show');
+            });
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // Medical Records JS Code - Prescription Management
+            // Initialize prescription data storage
+            let prescriptionData = [];
+            
+            // Add prescription field
+            $('#add-prescription').on('click', function() {
+                const newItem = `
+                    <div class="prescription-item row mb-2">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" placeholder="Medicine Name" name="medicine[]" required>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="Dosage" name="dosage[]">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="Duration" name="duration[]">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger btn-sm remove-prescription">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                $('#prescriptions-container').append(newItem);
+            });
+            
+            // Remove prescription field - Fixed to properly remove the item
+            $(document).on('click', '.remove-prescription', function() {
+                $(this).closest('.prescription-item').remove();
+                
+                // If no prescription items left, add one empty one
+                if ($('.prescription-item').length === 0) {
+                    const emptyItem = `
+                        <div class="prescription-item row mb-2">
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" placeholder="Medicine Name" name="medicine[]" required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" placeholder="Dosage" name="dosage[]">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" placeholder="Duration" name="duration[]">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-danger btn-sm remove-prescription">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    $('#prescriptions-container').append(emptyItem);
+                }
+            });
+            
+            // Clear prescriptions container and add default item
+            function resetPrescriptionsContainer() {
+                $('#prescriptions-container').empty();
+                const defaultItem = `
+                    <div class="prescription-item row mb-2">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" placeholder="Medicine Name" name="medicine[]" required>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="Dosage" name="dosage[]">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="Duration" name="duration[]">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger btn-sm remove-prescription">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                $('#prescriptions-container').append(defaultItem);
+            }
+            
+            // Collect prescription data from form
+            function collectPrescriptionData() {
+                const prescriptions = [];
+                $('.prescription-item').each(function() {
+                    const medicine = $(this).find('input[name="medicine[]"]').val();
+                    const dosage = $(this).find('input[name="dosage[]"]').val();
+                    const duration = $(this).find('input[name="duration[]"]').val();
+                    
+                    if (medicine) {
+                        prescriptions.push({
+                            medicine: medicine,
+                            dosage: dosage || '',
+                            duration: duration || ''
+                        });
+                    }
+                });
+                return prescriptions;
+            }
+            
+            // Fill prescription form with data
+            function fillPrescriptionForm(prescriptions) {
+                // Clear container first
+                $('#prescriptions-container').empty();
+                
+                // If no prescriptions, add one empty row
+                if (!prescriptions || prescriptions.length === 0) {
+                    resetPrescriptionsContainer();
+                    return;
+                }
+                
+                // Add each prescription to the form
+                prescriptions.forEach(function(prescription) {
+                    const item = `
+                        <div class="prescription-item row mb-2">
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" placeholder="Medicine Name" name="medicine[]" value="${prescription.medicine}" required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" placeholder="Dosage" name="dosage[]" value="${prescription.dosage}">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" placeholder="Duration" name="duration[]" value="${prescription.duration}">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-danger btn-sm remove-prescription">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    $('#prescriptions-container').append(item);
+                });
+            }
+            
+            // Reset medical record form
+            function resetMedicalRecordForm() {
+                $('#record-id').val('');
+                $('#record-patient').val('');
+                $('#record-doctor').val('');
+                $('#record-diagnosis').val('');
+                $('#record-treatment').val('');
+                $('#record-notes').val('');
+                resetPrescriptionsContainer();
+                $('#medicalRecordModalLabel').text('Add New Medical Record');
+            }
+            
+            // When the medical record modal is shown, reset form if adding new
+            $('#medicalRecordModal').on('show.bs.modal', function(e) {
+                if (!$('#record-id').val()) {
+                    resetMedicalRecordForm();
+                }
+            });
+            
+            // When the medical record modal is hidden, reset form
+            $('#medicalRecordModal').on('hidden.bs.modal', function(e) {
+                resetMedicalRecordForm();
+            });
+            
+            // View medical record
+            $(document).on('click', '.view-record', function() {
+                const recordId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill modal with record data
+                $('#view-record-patient').text(row.find('td:eq(1)').text());
+                $('#view-record-doctor').text(row.find('td:eq(2)').text());
+                $('#view-record-diagnosis').text(row.find('td:eq(3)').text());
+                $('#view-record-date').text(row.find('td:eq(4)').text());
+                
+                // Demo data for treatment and notes
+                $('#view-record-treatment').text('Rest and hydration. Take prescribed medications as directed.');
+                $('#view-record-notes').text('Patient reported improvement after 3 days of treatment.');
+                
+                // Demo data for prescriptions - in a real app, this would come from the database
+                let prescriptionsHtml = '';
+                if (recordId == 1) {
+                    prescriptionsHtml = `
+                        <tr>
+                            <td>Paracetamol</td>
+                            <td>500mg twice daily</td>
+                            <td>5 days</td>
+                        </tr>
+                        <tr>
+                            <td>Vitamin C</td>
+                            <td>1000mg once daily</td>
+                            <td>10 days</td>
+                        </tr>
+                    `;
+                } else if (recordId == 2) {
+                    prescriptionsHtml = `
+                        <tr>
+                            <td>Ibuprofen</td>
+                            <td>400mg as needed</td>
+                            <td>3 days</td>
+                        </tr>
+                        <tr>
+                            <td>Sumatriptan</td>
+                            <td>50mg once</td>
+                            <td>As needed for migraine</td>
+                        </tr>
+                    `;
+                }
+                $('#view-record-prescriptions').html(prescriptionsHtml);
+                
+                $('#viewRecordModal').modal('show');
+            });
+            
+            // Edit medical record
+
+            $(document).on('click', '.edit-record', function() {
+                const recordId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill form with record data
+                $('#record-id').val(recordId);
+                $('#record-patient').val(recordId == 1 ? 1 : 2); // Assuming John Doe has ID 1, Jane Smith has ID 2
+                $('#record-doctor').val(recordId == 1 ? 1 : 2); // Assuming Dr. Smith has ID 1, Dr. Johnson has ID 2
+                $('#record-diagnosis').val(row.find('td:eq(3)').text());
+                
+                // Demo data for treatment and notes
+                $('#record-treatment').val('Rest and hydration. Take prescribed medications as directed.');
+            $('#record-notes').val('Patient reported improvement after 3 days of treatment.');
+                
+                // Demo data for prescriptions - in a real app, this would come from the database
+                let prescriptions = [];
+                if (recordId == 1) {
+                    prescriptions = [
+                        { medicine: 'Paracetamol', dosage: '500mg twice daily', duration: '5 days' },
+                        { medicine: 'Vitamin C', dosage: '1000mg once daily', duration: '10 days' }
+                    ];
+                } else if (recordId == 2) {
+                    prescriptions = [
+                        { medicine: 'Ibuprofen', dosage: '400mg as needed', duration: '3 days' },
+                        { medicine: 'Sumatriptan', dosage: '50mg once', duration: 'As needed for migraine' }
+                    ];
+                }
+                
+                // Fill prescription form
+                fillPrescriptionForm(prescriptions);
+                
+                // Update modal title
+                $('#medicalRecordModalLabel').text('Edit Medical Record');
+                $('#medicalRecordModal').modal('show');
+            });
+            
+            // Delete medical record
+            $(document).on('click', '.delete-record', function() {
+                const recordId = $(this).data('id');
+                $('#delete-id').val(recordId);
+                $('#delete-type').val('record');
+                $('#deleteConfirmModal').modal('show');
+            });
+            
+            // CRUD Operations for Medical Records
+            $('#save-record').on('click', function() {
+                const recordId = $('#record-id').val();
+                const recordPatient = $('#record-patient option:selected').text();
+                const recordDoctor = $('#record-doctor option:selected').text();
+                const recordDiagnosis = $('#record-diagnosis').val();
+                const currentDate = new Date().toISOString().split('T')[0];
+                
+                if (!$('#record-patient').val() || !$('#record-doctor').val() || !recordDiagnosis) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Collect prescription data
+                const prescriptions = collectPrescriptionData();
+                if (prescriptions.length === 0) {
+                    alert('Please add at least one prescription.');
+                    return;
+                }
+                
+                // Demo: Add or update record in table
+                if (recordId) {
+                    // Update existing record
+                    const row = $(`#medical-records-table button.edit-record[data-id="${recordId}"]`).closest('tr');
+                    row.find('td:eq(1)').text(recordPatient);
+                    row.find('td:eq(2)').text(recordDoctor);
+                    row.find('td:eq(3)').text(recordDiagnosis);
+                    alert('Medical record updated successfully!');
+                } else {
+                    // Add new record
+                    const newRow = `
+                        <tr>
+                            <td>${$('#medical-records-table tbody tr').length + 1}</td>
+                            <td>${recordPatient}</td>
+                            <td>${recordDoctor}</td>
+                            <td>${recordDiagnosis}</td>
+                            <td>${currentDate}</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-info btn-sm view-record" data-id="${$('#medical-records-table tbody tr').length + 1}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-warning btn-sm edit-record" data-id="${$('#medical-records-table tbody tr').length + 1}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-record" data-id="${$('#medical-records-table tbody tr').length + 1}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#medical-records-table tbody').append(newRow);
+                    alert('Medical record added successfully!');
+                }
+                
+                // Reset form and close modal
+                resetMedicalRecordForm();
+                $('#medicalRecordModal').modal('hide');
+            });
+            
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+            // CRUD Operations for Users
+            $('#save-user').on('click', function() {
+                const userId = $('#user-id').val();
+                const username = $('#username').val();
+                const userFullname = $('#user-fullname').val();
+                const userEmail = $('#user-email').val();
+                const userRole = $('#user-role').val();
+                
+                if (!username || !$('#user-password').val() || !userFullname || !userEmail) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Demo: Add or update user in table
+                if (userId) {
+                    // Update existing user
+                    alert('User updated successfully!');
+                } else {
+                    // Add new user
+                    const roleBadge = userRole === 'admin' ? 'danger' : (userRole === 'doctor' ? 'primary' : 'secondary');
+                    const newRow = `
+                        <tr>
+                            <td>${$('#users-table tbody tr').length + 1}</td>
+                            <td>${username}</td>
+                            <td>${userFullname}</td>
+                            <td>${userEmail}</td>
+                            <td><span class="badge bg-${roleBadge}">${userRole.charAt(0).toUpperCase() + userRole.slice(1)}</span></td>
+                            <td class="action-buttons">
+                                <button class="btn btn-info btn-sm view-user" data-id="${$('#users-table tbody tr').length + 1}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-warning btn-sm edit-user" data-id="${$('#users-table tbody tr').length + 1}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-user" data-id="${$('#users-table tbody tr').length + 1}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#users-table tbody').append(newRow);
+                    alert('User added successfully!');
+                }
+                
+                // Reset form and close modal
+                $('#user-form')[0].reset();
+                $('#userModal').modal('hide');
+            });
+            
+            // Edit user
+            $(document).on('click', '.edit-user', function() {
+                const userId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill form with user data
+                $('#user-id').val(userId);
+                $('#username').val(row.find('td:eq(1)').text());
+                $('#user-password').val(''); // Don't fill password for security
+                $('#user-fullname').val(row.find('td:eq(2)').text());
+                $('#user-email').val(row.find('td:eq(3)').text());
+                
+                // Extract role from badge text
+                const role = row.find('td:eq(4)').text().trim().toLowerCase();
+                $('#user-role').val(role);
+                
+                // Update modal title
+                $('#userModalLabel').text('Edit User');
+                $('#userModal').modal('show');
+            });
+            
+            // View user
+            $(document).on('click', '.view-user', function() {
+                const userId = $(this).data('id');
+                const row = $(this).closest('tr');
+                
+                // Fill modal with user data
+                $('#view-username').text(row.find('td:eq(1)').text());
+                $('#view-user-fullname').text(row.find('td:eq(2)').text());
+                $('#view-user-email').text(row.find('td:eq(3)').text());
+                $('#view-user-role').text(row.find('td:eq(4)').text().trim());
+                
+                $('#viewUserModal').modal('show');
+            });
+
+            // Delete user
+            $(document).on('click', '.delete-user', function() {
+                const userId = $(this).data('id');
+                $('#delete-id').val(userId);
+                $('#delete-type').val('user');
+                $('#deleteConfirmModal').modal('show');
+            });
+        
+            
+
+
+
+
+            // Confirm delete
+            $('#confirm-delete').on('click', function() {
+                const id = $('#delete-id').val();
+                const type = $('#delete-type').val();
+                
+                // Demo: Remove row from table
+                switch(type) {
+                    case 'patient':
+                        $(`#patients-table .delete-patient[data-id="${id}"]`).closest('tr').remove();
+                        break;
+                    case 'doctor':
+                        $(`#doctors-table .delete-doctor[data-id="${id}"]`).closest('tr').remove();
+                        break;
+                    case 'appointment':
+                        $(`#appointments-table .delete-appointment[data-id="${id}"]`).closest('tr').remove();
+                        break;
+                    case 'record':
+                        $(`#medical-records-table .delete-record[data-id="${id}"]`).closest('tr').remove();
+                        break;
+                    case 'user':
+                        $(`#users-table .delete-user[data-id="${id}"]`).closest('tr').remove();
+                        break;
+                }
+                
+                alert('Item deleted successfully!');
+                $('#deleteConfirmModal').modal('hide');
+            });
+            
+                        
+                    
+        });
+    </script>
