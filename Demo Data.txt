@@ -1,0 +1,67 @@
+INSERT INTO users (username, password_hash, role, full_name, email)
+VALUES 
+('admin1', '$2y$10$demoAdminPassHash', 'admin', 'Alice Admin', 'alice.admin@example.com'),
+('drjohn', '$2y$10$demoDoctorPassHash', 'doctor', 'Dr. John Smith', 'dr.john@example.com'),
+('staff1', '$2y$10$demoStaffPassHash', 'staff', 'Emily Staff', 'emily.staff@example.com');
+
+
+
+
+INSERT INTO doctors (name, specialization, phone, email)
+VALUES 
+('Dr. John Smith', 'Cardiology', '1234567890', 'dr.john@example.com'),
+('Dr. Jane Doe', 'Pediatrics', '0987654321', 'dr.jane@example.com'),
+('Dr. Raj Kumar', 'Neurology', '1122334455', 'dr.raj@example.com');
+
+
+
+
+INSERT INTO patients ( 
+    name, gender, dob, blood_group,
+    phone, emergency_contact_no, emergency_contact_name, relation_with_patient,
+    email, address
+)
+VALUES 
+('Tom Anderson', 'Male', '1985-06-15', 'O+', '5551234567', '5559990000', 'Laura Anderson', 'Wife', 'tom.anderson@example.com', '123 Main St'),
+('Sarah Connor', 'Female', '1990-12-02', 'A+', '5552345678', '5558881111', 'John Connor', 'Son', 'sarah.connor@example.com', '456 Oak Ave'),
+('Ravi Patel', 'Male', '1978-03-22', 'B+', '5553456789', '5557772222', 'Anita Patel', 'Wife', 'ravi.patel@example.com', '789 Pine Rd'),
+('Emily Clarke', 'Female', '2002-08-11', 'AB-', '5554567890', '5556663333', 'David Clarke', 'Father', 'emily.clarke@example.com', '101 Maple Ln'),
+('Mohamed Ali', 'Male', '1980-01-30', 'O-', '5555678901', '5554441111', 'Sara Ali', 'Sister', 'mohamed.ali@example.com', '202 Cedar Blvd');
+
+
+
+
+INSERT INTO appointments (patient_id, doctor_id, appointment_date, reason, status)
+VALUES 
+(1, 1, '2025-07-01 10:00:00', 'Chest pain consultation', 'Scheduled'),
+(2, 2, '2025-07-02 14:30:00', 'Child vaccination', 'Completed'),
+(3, 3, '2025-07-03 09:00:00', 'Frequent headaches', 'Scheduled'),
+(4, 1, '2025-07-04 11:15:00', 'Routine checkup', 'Cancelled'),
+(5, 2, '2025-07-05 13:00:00', 'Fever and cold', 'Scheduled');
+
+
+
+
+
+INSERT INTO medical_records (patient_id, doctor_id, diagnosis, treatment, notes)
+VALUES 
+(1, 1, 'Mild heart murmur', 'Monitor and follow-up', 'ECG recommended'),
+(2, 2, 'Normal post-vaccination symptoms', 'Paracetamol for fever', 'Patient is stable'),
+(3, 3, 'Migraine', 'Pain relief medication', 'Avoid screen time'),
+(4, 1, 'All good', 'N/A', 'No issues detected'),
+(5, 2, 'Viral fever', 'Rest and fluids', 'Check again in 3 days');
+
+
+
+
+INSERT INTO prescriptions (record_id, medicine_name, dosage, duration)
+VALUES 
+(1, 'Atenolol', '50mg once daily', '30 days'),
+(2, 'Paracetamol', '500mg thrice a day', '3 days'),
+(3, 'Sumatriptan', '1 tablet during headache', 'As needed'),
+(5, 'Ibuprofen', '400mg twice a day', '5 days'),
+(5, 'ORS Solution', 'As required', 'Until recovery');
+
+
+
+
